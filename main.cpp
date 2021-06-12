@@ -1,8 +1,30 @@
 #include<iostream>
 #include<GLFW/glfw3.h>
+#include<math.h>
 
 const int steps = 100;
-const float angle = 3.14152926 * 2.f / steps;
+
+void  drawCircle(float red, float green, float blue) {
+	float radius = 1.;
+	const float angle = 3.1415926 * 2 / steps;
+	float oldX = 0;
+	float oldY = 1;
+	for (int i = 0; i <= steps; i++)
+	{
+		float newX = radius * sin(angle * i);
+		float newY = -radius * cos(angle * i);
+
+		glColor3f(red, green, blue);
+		glBegin(GL_TRIANGLES);
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(oldX, oldY, 0.0f);
+		glVertex3f(newX, newY, 0.0f);
+		glEnd();
+
+		oldX = newX;
+		oldY = newY;
+	}
+}
 
 int main() {
 	GLFWwindow* window;
@@ -18,47 +40,37 @@ int main() {
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-	
-	float xPos = 0;
-	float yPos = 0;
-	float radius = 1.0f;
-	float c1 = 0.0f;
-	float c2 = 1.0f;
-	float c3 = 0.0f;
-	float inc = 1.0 / steps;
 
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glScalef(0.1, 0.1, 1);
+
+	float angle = 0;
+	float Moonangle = 0;
 	while (!glfwWindowShouldClose(window)) {
-		float c1 = 1.0f;
-		float c2 = 0.0f;
-		float c3 = 0.0f;
-		float inc = 1.0 / steps;
-
-		glClearColor(1.0, 1.0, 1.0, 0.0);
+		angle += .1;
+		Moonangle += 1;
+		glClearColor(0.0, 0.0, 0.0, 0.0);
 		glClear(GL_COLOR_BUFFER_BIT);
+		//sun
+		drawCircle(1, 1, 0);
 
-		float prevX = xPos;
-		float prevY = yPos - radius;
-
-		for (int i = 0; i <= steps; i++) {
-
-			float newX = radius * sin(angle * i);
-			float newY = -radius * cos(angle * i);
-
-			glBegin(GL_TRIANGLES);
-			glColor3f(c1, c2, c3);
-			glVertex3f(0.0f, 0.0f, 0.0f);
-			glVertex3f(prevX, prevY, 0.0f);
-			glVertex3f(newX, newY, 0.0f);
-			glEnd();
-
-			prevX = newX;
-			prevY = newY;
-			c1 = c1 - inc;
-			c2 = c2 + inc;
-			c3 = c3 + inc;
-
+		{
+			glPushMatrix();
+			glRotatef(angle, 0, 0, 1);
+			glTranslatef(0, 5, 0);
+			glScalef(0.6, 0.6, 1);
+			drawCircle(0, 0.3, 1);
+			{
+				glPushMatrix();
+				glRotatef(Moonangle, 0, 0, 1);
+				glTranslatef(0, 3, 0);
+				glScalef(0.5, 0.5, 1);
+				drawCircle(0.5, 0.5, 0.5);
+				glPopMatrix();
+			}
+			glPopMatrix();
 		}
-		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
